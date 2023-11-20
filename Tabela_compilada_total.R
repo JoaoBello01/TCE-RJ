@@ -1,15 +1,15 @@
-# Carregando as bibliotecas necess·rias
+# Carregando as bibliotecas necess√°rias
 library(tidyverse)
 library(readxl)
 library(writexl)
 
-# FunÁ„o para abrir arquivos relacionados ‡ AV_Bimestral_2
+# Fun√ß√£o para abrir arquivos relacionados √† AV_Bimestral_2
 abrir_av_bimestral_2 <- function(caminho, filtro) {
   # Listando todos os arquivos no caminho especificado
   arquivos <- list.files(caminho, full.names = TRUE, recursive = TRUE)
   # Filtrando os arquivos que correspondem ao filtro
   arquivos <- arquivos[!grepl(filtro, arquivos)]
-  # Selecionando pastas que correspondem a padrıes especÌficos nos nomes dos arquivos
+  # Selecionando pastas que correspondem a padr√µes espec√≠ficos nos nomes dos arquivos
   pastas_av_bimestral_2 <- grep("AV_Bimestral_2|AV_2_Bimestral|AV_Bimesrtal_2|Pactuacao_AV_2", arquivos, value = TRUE)
   # Criando uma tibble com os nomes das pastas encontradas
   arquivos <- tibble(arquivo = pastas_av_bimestral_2)
@@ -17,13 +17,13 @@ abrir_av_bimestral_2 <- function(caminho, filtro) {
   return(arquivos)
 }
 
-# FunÁ„o para abrir arquivos relacionados ‡ AV_Bimestral_1
+# Fun√ß√£o para abrir arquivos relacionados √† AV_Bimestral_1
 abrir_av_bimestral_1 <- function(caminho, filtro) {
   # Listando todos os arquivos no caminho especificado
   arquivos <- list.files(caminho, full.names = TRUE, recursive = TRUE)
   # Filtrando os arquivos que correspondem ao filtro
   arquivos <- arquivos[!grepl(filtro, arquivos)]
-  # Selecionando arquivos com extens„o ".xlsm"
+  # Selecionando arquivos com extens√£o ".xlsm"
   pastas_av1 <- arquivos[grepl(".xlsm", arquivos)]
   # Criando uma tibble com os nomes dos arquivos encontrados
   arquivos <- tibble(arquivo = pastas_av1)
@@ -31,12 +31,12 @@ abrir_av_bimestral_1 <- function(caminho, filtro) {
   return(arquivos)
 }
 
-# FunÁ„o para ler uma planilha de dados especÌfica
+# Fun√ß√£o para ler uma planilha de dados espec√≠fica
 ler_planilha_dados <- function(caminho_completo) {
-  # Lendo a planilha Excel especificada e extraindo um intervalo de cÈlulas
-  cabeÁalho <- read_excel(caminho_completo, sheet = "Principal", range = "b8:c19")
-  # Realizando algumas manipulaÁıes nos dados lidos
-  cabeÁalho <- cabeÁalho %>%
+  # Lendo a planilha Excel especificada e extraindo um intervalo de c√©lulas
+  cabe√ßalho <- read_excel(caminho_completo, sheet = "Principal", range = "b8:c19")
+  # Realizando algumas manipula√ß√µes nos dados lidos
+  cabe√ßalho <- cabe√ßalho %>%
     t() %>%
     as_tibble() %>%
     rownames_to_column("value") %>%
@@ -44,14 +44,14 @@ ler_planilha_dados <- function(caminho_completo) {
     .[-1,] %>%
     `rownames<-`(NULL)
   
-  return(cabeÁalho)
+  return(cabe√ßalho)
 }
 
-# FunÁ„o para ler notas de servidores a partir de uma planilha
+# Fun√ß√£o para ler notas de servidores a partir de uma planilha
 notas_servidores <- function(caminho_completo){
-  # Lendo a planilha Excel especificada e extraindo um intervalo de cÈlulas
-  nota <- read_excel(caminho_completo, sheet = "AvaliaÁ„o", range = "C44:E62") 
-  # Realizando algumas manipulaÁıes nos dados lidos
+  # Lendo a planilha Excel especificada e extraindo um intervalo de c√©lulas
+  nota <- read_excel(caminho_completo, sheet = "Avalia√ß√£o", range = "C44:E62") 
+  # Realizando algumas manipula√ß√µes nos dados lidos
   nota <- nota %>% t() %>% 
     as_tibble() %>% 
     rownames_to_column("value") %>% 
@@ -59,150 +59,154 @@ notas_servidores <- function(caminho_completo){
     .[-c(1, 2),] %>%
     `rownames<-`(NULL) 
   
-  # Chamando a funÁ„o ler_planilha_dados para obter um cabeÁalho
-  cabeÁalho <- ler_planilha_dados(caminho_completo)
-  # Chamando a funÁ„o qualitativo (que n„o est· definida no cÛdigo) para obter escala
+  # Chamando a fun√ß√£o ler_planilha_dados para obter um cabe√ßalho
+  cabe√ßalho <- ler_planilha_dados(caminho_completo)
+  # Chamando a fun√ß√£o qualitativo (que n√£o est√° definida no c√≥digo) para obter escala
   escala <- qualitativo(caminho_completo)
-  # Combinando os dados do cabeÁalho, nota e escala em uma ˙nica tibble
-  nota <- bind_cols(cabeÁalho, nota, escala)
+  # Combinando os dados do cabe√ßalho, nota e escala em uma √∫nica tibble
+  nota <- bind_cols(cabe√ßalho, nota, escala)
   
   return(nota)
 }
 
-# FunÁ„o para processar os resultados da AV_Bimestral_2
+# Fun√ß√£o para processar os resultados da AV_Bimestral_2
 resultado_Av2 <- function(av2)
 {
   # Lendo a planilha Excel especificada com tipos de coluna especificados
-  avaliaÁ„o_av2 <- read_excel(av2, sheet = "ResultadoDaAvParcial", col_types = c("numeric", "numeric", "date", "text", "text",
+  avalia√ß√£o_av2 <- read_excel(av2, sheet = "ResultadoDaAvParcial", col_types = c("numeric", "numeric", "date", "text", "text",
                                                                                  "text", "text", "text", "text", "text", "numeric",
                                                                                  "numeric", "numeric","text", "text"))
-  # Chamando a funÁ„o AvaliaÁ„o_Qualitativa para fazer mais manipulaÁıes nos dados
-  avaliaÁ„o_av2 <- AvaliaÁ„o_Qualitativa(av2, avaliaÁ„o_av2)
+  # Chamando a fun√ß√£o Avalia√ß√£o_Qualitativa para fazer mais manipula√ß√µes nos dados
+  avalia√ß√£o_av2 <- Avalia√ß√£o_Qualitativa(av2, avalia√ß√£o_av2)
   
-  return(avaliaÁ„o_av2)
+  return(avalia√ß√£o_av2)
 }
 
-# FunÁ„o para processar os resultados da AV_Bimestral_1
+# Fun√ß√£o para processar os resultados da AV_Bimestral_1
 resultado_Av1 <- function(av1)
 {
   # Lendo a planilha Excel especificada com tipos de coluna especificados
-  avaliaÁ„o_av1 <- read_excel(av1, sheet = "TabelaCompilada", col_types = c("numeric", "numeric", "date", "text", "text",
+  avalia√ß√£o_av1 <- read_excel(av1, sheet = "TabelaCompilada", col_types = c("numeric", "numeric", "date", "text", "text",
                                                                             "text", "text", "text", "text","numeric","numeric", 
                                                                             "numeric", "text"))
-  # Chamando a funÁ„o AvaliaÁ„o_Qualitativa para fazer mais manipulaÁıes nos dados
-  avaliaÁ„o_av1 <- AvaliaÁ„o_Qualitativa(av1, avaliaÁ„o_av1)
+  # Chamando a fun√ß√£o Avalia√ß√£o_Qualitativa para fazer mais manipula√ß√µes nos dados
+  avalia√ß√£o_av1 <- Avalia√ß√£o_Qualitativa(av1, avalia√ß√£o_av1)
   
-  return(avaliaÁ„o_av1)
+  return(avalia√ß√£o_av1)
 }
 
-# FunÁ„o para processar dados qualitativos de avaliaÁ„o
-AvaliaÁ„o_Qualitativa <- function(caminho, cabeÁalho)
+# Fun√ß√£o para processar dados qualitativos de avalia√ß√£o
+Avalia√ß√£o_Qualitativa <- function(caminho, cabe√ßalho)
 {
-  # Lendo a planilha Excel especificada e extraindo um intervalo de cÈlulas
-  Qualitativa <- t(read_excel(caminho, sheet = "AvaliaÁ„o", range = "C44:E63")) %>% as_tibble
+  # Lendo a planilha Excel especificada e extraindo um intervalo de c√©lulas
+  Qualitativa <- t(read_excel(caminho, sheet = "Avalia√ß√£o", range = "C44:E63")) %>% as_tibble
   colnames(Qualitativa) <- Qualitativa[1,]
   Qualitativa <- Qualitativa[-c(1,2),]
-  # Combinando os dados lidos com o cabeÁalho fornecido
-  Qualitativa <- bind_cols(cabeÁalho, Qualitativa)
+  # Combinando os dados lidos com o cabe√ßalho fornecido
+  Qualitativa <- bind_cols(cabe√ßalho, Qualitativa)
   
   return(Qualitativa)
 }
 
-# FunÁ„o para realizar a limpeza dos dados em uma tabela compilada
+# Fun√ß√£o para realizar a limpeza dos dados em uma tabela compilada
 limpeza_dos_dados <- function(tabela_compilada)
 {
-  # Realizando uma junÁ„o completa entre tabelas tabela_av1 e tabela_av2 (n„o definidas no cÛdigo)
+  # Realizando uma jun√ß√£o completa entre tabelas tabela_av1 e tabela_av2 (n√£o definidas no c√≥digo)
   tabela_compilada$`DATA INICIO ESTAGIO PROB` <- as.numeric(tabela_compilada$`DATA INICIO ESTAGIO PROB`)
   tabela_compilada$`DATA INICIO ESTAGIO PROB` <- as.Date(tabela_compilada$`DATA INICIO ESTAGIO PROB`, origin = "1899-12-30")
-  # Filtrando dados onde RESULTADO n„o È NA e maior que zero
+  # Filtrando dados onde RESULTADO n√£o √© NA e maior que zero
   tabela_compilada<- tabela_compilada %>% filter(!is.na(RESULTADO) & RESULTADO > 0)
   # Substituindo "02/" por nada na coluna MATRICULA
   tabela_compilada$MATRICULA <- str_replace_all(tabela_compilada$MATRICULA, "02/","")
   
-  # Realizando uma transformaÁ„o na coluna `[Servidor] COMUNICA«√O`
+  # Realizando uma transforma√ß√£o na coluna `[Servidor] COMUNICA√á√ÉO`
   tabela_compilada<- tabela_compilada %>%
-    mutate(`[Servidor] COMUNICA«√O` = ifelse(!is.na(`[Servidor] FALAR BEM EM P⁄BLICO`), `[Servidor] FALAR BEM EM P⁄BLICO`, `[Servidor] COMUNICA«√O`)) %>% select(-16)
+    mutate(`[Servidor] COMUNICA√á√ÉO` = ifelse(!is.na(`[Servidor] FALAR BEM EM P√öBLICO`), `[Servidor] FALAR BEM EM P√öBLICO`, `[Servidor] COMUNICA√á√ÉO`)) %>% select(-16)
   
-  # Selecionando colunas especÌficas
+  # Selecionando colunas espec√≠ficas
   tabela_compilada <- select(tabela_compilada, -c(32,34:61))
   
   # Reordenando as colunas da tabela
   tabela_compilada <- tabela_compilada %>% select(1:14, 32, everything())
   
-  # Realizando uma transformaÁ„o em algumas colunas especÌficas
+  # Realizando uma transforma√ß√£o em algumas colunas espec√≠ficas
   tabela_compilada <- tabela_compilada %>%
     mutate(across(14:25, ~ifelse(PERFIL == "T" & !is.na(`[Servidor] QUALIDADE`), NA, .)))
   
   return(tabela_compilada)
 }
 
-# FunÁ„o para criar um arquivo Excel a partir de uma tabela compilada
+# Fun√ß√£o para criar um arquivo Excel a partir de uma tabela compilada
 criar_excel <- function(tabela_compilada)
 {
-  write_xlsx(tabela_compilada, "F:/CDP/AvaliaÁ„o de Desempenho/Ciclo 2023/tabela_compilada_total.xlsx") 
+  write_xlsx(tabela_compilada, "F:/CDP/Avalia√ß√£o de Desempenho/Ciclo 2023/tabela_compilada_total.xlsx") 
 }
 
-# FunÁ„o para multiplicar valores em colunas especÌficas
+# Fun√ß√£o para multiplicar valores em colunas espec√≠ficas
 multiplicar <- function(colunas)
 {
   colunas <- 2 * colunas
   return (colunas)
 }
 
-# FunÁ„o para processar indicadores
+# Fun√ß√£o para processar indicadores
 indicadores <- function(cesta_de_indicadores)
 {
-  # adicionando ao ANO a vari·vel N∫AVALIA«√O e selecionando colunas especÌficas
+  # adicionando ao ANO a vari√°vel N¬∫AVALIA√á√ÉO e selecionando colunas espec√≠ficas
     cesta_de_indicadores <- cesta_de_indicadores %>%
-    mutate(ANO = paste(ANO, N∫AVALIA«√O, sep = ".")) %>%
+    mutate(ANO = paste(ANO, N¬∫AVALIA√á√ÉO, sep = ".")) %>%
     select(-1) %>%
-    # Convertendo colunas 9 a 27 para numÈricas
+    # Convertendo colunas 9 a 27 para num√©ricas
     mutate(across(9:27, as.numeric)) %>%
-    # Multiplicando valores em colunas especÌficas se o ANO for "2022.1" ou "2022.2"
+    # Multiplicando valores em colunas espec√≠ficas se o ANO for "2022.1" ou "2022.2"
     mutate(across(9:27, ~ifelse(ANO == "2022.1" | ANO == "2022.2", multiplicar(.), .)))  %>%
-      filter(ANO != "2023.2") %>% mutate(RESULTADO = RESULTADO * 100)
-    
+      filter(ANO != "2023.2") %>% mutate(RESULTADO = RESULTADO * 100) %>% 
+      mutate(SETOR = case_when(SETOR == "CAP1" ~ "1¬™CAP",
+                               SETOR == "CAP2" ~ "2¬™CAP",
+                               SETOR == "CAP3" ~ "3¬™CAP",
+                               SETOR == "ECG/TCE-RJ" ~ "ECG",
+                               TRUE ~ SETOR))
     return(cesta_de_indicadores)
 }
 
-# FunÁ„o para criar um gr·fico de histograma
+# Fun√ß√£o para criar um gr√°fico de histograma
 valores_grafico_histograma <- function(cesta_de_indicadores)
 {
-  # Filtrar os dados para o perÌodo "2023.1" e calcular a mÈdia por SETOR
+  # Filtrar os dados para o per√≠odo "2023.1" e calcular a m√©dia por SETOR
   top_bottom_sem_100 <- cesta_de_indicadores %>%
     filter(ANO == "2023.1") %>%
     group_by(SETOR) %>%
     summarise(media = mean(RESULTADO)) %>%
     arrange(desc(media)) %>% filter(media != 100)
   
-  # Definir a ordem dos fatores no gr·fico com base nas mÈdias
+  # Definir a ordem dos fatores no gr√°fico com base nas m√©dias
   top_bottom_sem_100$SETOR <- factor(top_bottom_sem_100$SETOR, levels = unique(top_bottom_sem_100$SETOR))
   
   # Selecionar os cinco melhores e os cinco piores SETORES
   top_bottom_sem_100 <- top_bottom_sem_100 %>%
     slice(c(1:5, (n() - 4):n()))
   
-  # Criar um grupo com base na mÈdia em relaÁ„o ‡ mÈdia geral
+  # Criar um grupo com base na m√©dia em rela√ß√£o √† m√©dia geral
   top_bottom_sem_100$Grupo <- ifelse(top_bottom_sem_100$media >= mean(cesta_de_indicadores$RESULTADO), "Os cinco melhores", "Os cinco piores")
   
-  # Chamar a funÁ„o grafico_histograma e passar os dados processados
+  # Chamar a fun√ß√£o grafico_histograma e passar os dados processados
   grafico_histograma(top_bottom_sem_100)
 }
 
-# FunÁ„o para criar um gr·fico de histograma com base em dados processados
+# Fun√ß√£o para criar um gr√°fico de histograma com base em dados processados
 grafico_histograma <- function(dados_media)
 {
   # Definir cores para os grupos
   cores <- c("Os cinco melhores" = "green", "Os cinco piores" = "red")
   
-  # Criar o gr·fico de barras
+  # Criar o gr√°fico de barras
   media_top5_e_bottom5 <- ggplot(dados_media, aes(x = reorder(SETOR, media), y = media, fill = Grupo)) +
     geom_bar(stat = "identity") +
     scale_fill_manual(values = cores) + 
     geom_hline(yintercept = mean(cesta_de_indicadores$RESULTADO), color = "red", linetype = "dashed") + 
-    labs(title = "Os cinco setores com as melhores e piores mÈdias em 2023.1",
+    labs(title = "Os cinco setores com as melhores e piores m√©dias em 2023.1",
          x = "Setor",
-         y = "MÈdia de Resultado (%)") +
+         y = "M√©dia de Resultado (%)") +
     geom_text(aes(label = sprintf("%.2f", media)), vjust = -0.5, size = 4) + 
     annotate("text", x = 1, y = mean(cesta_de_indicadores$RESULTADO), label = sprintf("%.3f", mean(cesta_de_indicadores$RESULTADO)), vjust = -0.5, color = "red") +
     coord_cartesian(ylim = c(75, 100))
@@ -210,14 +214,14 @@ grafico_histograma <- function(dados_media)
   return(media_top5_e_bottom5)
 }
 
-# FunÁ„o para criar um gr·fico de boxplot
+# Fun√ß√£o para criar um gr√°fico de boxplot
 grafico_boxplot <- function(cesta_de_indicadores)
 {
-  # Criar o gr·fico de boxplot para visualizar a distribuiÁ„o de resultados por perÌodos avaliativos
+  # Criar o gr√°fico de boxplot para visualizar a distribui√ß√£o de resultados por per√≠odos avaliativos
   distribuicao_resultado <- ggplot(cesta_de_indicadores, aes(x = ANO, y = RESULTADO)) + 
     geom_boxplot(fill = "dodgerblue", color = "black", alpha = 1) +
-    labs(title = "DistribuiÁ„o de Resultados por PerÌodos Avaliativos", 
-         x = "PerÌodo Avaliativo",
+    labs(title = "Distribui√ß√£o de Resultados por Per√≠odos Avaliativos", 
+         x = "Per√≠odo Avaliativo",
          y = "Resultado (%)") +
     theme_minimal() +
     theme(axis.title.x = element_text(size = 12),
@@ -234,32 +238,57 @@ grafico_boxplot <- function(cesta_de_indicadores)
   return(distribuicao_resultado)
 }
 
-# FunÁ„o para criar um gr·fico de linha (sÈrie temporal)
+# Fun√ß√£o para criar um gr√°fico de linha (s√©rie temporal)
 grafico_linha <- function(cesta_de_indicadores)
 {
-  # Calcular mÈdia e desvio padr„o por ANO
+  # Calcular m√©dia e desvio padr√£o por ANO
   serie_temporal <- cesta_de_indicadores %>% group_by(ANO) %>% summarise(media = mean(RESULTADO),
                                                                          desvio_padrao = sd(RESULTADO))
   
-  # Criar o gr·fico de linha (sÈrie temporal) com mÈdia e desvio padr„o
+  # Criar o gr√°fico de linha (s√©rie temporal) com m√©dia e desvio padr√£o
   media_e_desvio_padrao_pelo_tempo <- ggplot(serie_temporal, aes(x = ANO, y = media, group = 1)) +
     geom_point(color = "blue", size = 3) +
     geom_line(color = "red") +
     geom_text(aes(label = sprintf("%.3f", desvio_padrao)), vjust = -1, hjust = 0.5, size = 4, color = "black") +
     geom_text(aes(label = sprintf("%.1f", media)), vjust = 2, hjust = 0.4, size = 5, color = "black") +
-    labs(x = "Ano", y = "MÈdia de Valores", title = "SÈrie Temporal e Desvio Padr„o") +
+    labs(x = "Ano", y = "M√©dia de Valores", title = "S√©rie Temporal e Desvio Padr√£o") +
     theme_classic() + 
     coord_cartesian(ylim = c(95,97))
   
   return(media_e_desvio_padrao_pelo_tempo)
 }
 
-# Definir caminhos e filtros para buscar os arquivos
-caminho <- c("M:/","F:/CDP/AvaliaÁ„o de Desempenho/Ciclo 2022/BACKUP")
-filtro_av1 <- c("Banco|Banco2|Servidor|~\\$|.pdf|_MATRIZ PRODUTOS|MODELO|TabelaCompilada|AV_Bimestral_2|AvaliaÁ„o 1∫ ciclo|PactuaÁ„o 2∫ Ciclo|202209-202208|Matriz|AV_2_Bimestral|GC6preenchida|AV_Bimesrtal_2|STE-30-05-2023|M://GAP/2022/|Pactuacao_AV_2|PARA AVALIA«√O SUBJETIVA")
-filtro_av2 <- c("~\\$|Respons·veis de ¡rea|historico|pdf|PDF|_MATRIZ PRODUTOS|MODELO|TabelaCompilada|GC6preenchida|Tabela_Compilada|Matriz_produtos|Tabela Compilada|.txt|M://SUBPES/AV_Bimestral_2/SUB-SEGURIDADE/")
+# Esta fun√ß√£o calcula as m√©dias e contagens de servidores por SETOR e ANO a partir do quadro de dados 'cesta_de_indicadores'.
+# Retorna um quadro de dados com m√©dias e contagens para cada combina√ß√£o de SETOR e ANO.
+calcular_medias_dos_setores_em_cada_avaliacao <- function(cesta_de_indicadores) {
+  # Agrupa os dados por SETOR e ANO, calcula a m√©dia e a contagem de servidores e cria um quadro de dados resultante.
+  media_por_setores <- cesta_de_indicadores %>%
+    group_by(SETOR, ANO) %>%
+    summarise(media = mean(RESULTADO), servidores = n()) %>%
+    pivot_wider(names_from = ANO, values_from = c(media, servidores), names_glue = "{.value}_{ANO}")
+  return(media_por_setores)
+}
 
-# Abrir pastas relacionadas ‡ AV_Bimestral_1 e AV_Bimestral_2
+# Esta fun√ß√£o calcula a variabilidade entre as m√©dias de diferentes avalia√ß√µes (ANO) para cada SETOR.
+# Ela identifica as linhas em que pelo menos duas avalia√ß√µes t√™m valores n√£o ausentes (n√£o NA) e calcula a variabilidade entre elas.
+# Retorna um quadro de dados contendo apenas as linhas em que pelo menos duas avalia√ß√µes t√™m valores n√£o ausentes (n√£o NA).
+variabilidade_por_setor <- function(media_por_setores) {
+  # Filtra as linhas em que pelo menos duas avalia√ß√µes t√™m valores n√£o ausentes.
+  resultado <- media_por_setores[rowSums(!is.na(media_por_setores[c("media_2022.1", "media_2022.2", "media_2023.1")])) >= 2, ] %>%
+    # Calcula a variabilidade entre as avalia√ß√µes 2022.1 e 2022.2 e entre 2022.2 e 2023.1.
+    mutate(variacao_2022.1_2022.2 = ifelse(!is.na(media_2022.1) & !is.na(media_2022.2),
+                                           media_2022.2 - media_2022.1, NA_real_),
+           variacao_2022.2_2023.1 = ifelse(!is.na(media_2022.2) & !is.na(media_2023.1),
+                                           media_2023.1 - media_2022.2, NA_real_)) 
+  return(resultado)
+}
+
+# Definir caminhos e filtros para buscar os arquivos
+caminho <- c("M:/","F:/CDP/Avalia√ß√£o de Desempenho/Ciclo 2022/BACKUP")
+filtro_av1 <- c("Banco|Banco2|Servidor|~\\$|.pdf|_MATRIZ PRODUTOS|MODELO|TabelaCompilada|AV_Bimestral_2|Avalia√ß√£o 1¬∫ ciclo|Pactua√ß√£o 2¬∫ Ciclo|202209-202208|Matriz|AV_2_Bimestral|GC6preenchida|AV_Bimesrtal_2|STE-30-05-2023|M://GAP/2022/|Pactuacao_AV_2|PARA AVALIA√á√ÉO SUBJETIVA")
+filtro_av2 <- c("~\\$|Respons√°veis de √Årea|historico|pdf|PDF|_MATRIZ PRODUTOS|MODELO|TabelaCompilada|GC6preenchida|Tabela_Compilada|Matriz_produtos|Tabela Compilada|.txt|M://SUBPES/AV_Bimestral_2/SUB-SEGURIDADE/")
+
+# Abrir pastas relacionadas √† AV_Bimestral_1 e AV_Bimestral_2
 pastas_av1 <- abrir_av_bimestral_1(caminho, filtro_av1)
 pastas_av2 <- abrir_av_bimestral_2(caminho, filtro_av2)
 
@@ -276,18 +305,22 @@ cesta_de_indicadores <- indicadores(select(tabela_compilada, -c(3,4,9,13)))
 # Criar um arquivo Excel com os dados processados
 criar_excel(tabela_compilada)
 
-# Gerar gr·fico de histograma com os cinco melhores e cinco piores setores
+# Gerar gr√°fico de histograma com os cinco melhores e cinco piores setores
 histograma_top5_e_bottom5 <- valores_grafico_histograma(cesta_de_indicadores)
 
-# Gerar gr·fico de boxplot para visualizar a distribuiÁ„o de resultados por perÌodos avaliativos
+# Gerar gr√°fico de boxplot para visualizar a distribui√ß√£o de resultados por per√≠odos avaliativos
 metricas_dos_resultados <- grafico_boxplot(cesta_de_indicadores)
 
-# Gerar gr·fico de linha (sÈrie temporal) com mÈdias e desvio padr„o
+# Gerar gr√°fico de linha (s√©rie temporal) com m√©dias e desvio padr√£o
 serie_temporal_resultado_total <- grafico_linha(cesta_de_indicadores)
 
-# Exibir os gr·ficos
+# Exibir os gr√°ficos
 plot(histograma_top5_e_bottom5)
 plot(metricas_dos_resultados)
 plot(serie_temporal_resultado_total)
 
+# Chama a fun√ß√£o 'calcular_medias_dos_setores_em_cada_avaliacao' para calcular m√©dias e contagens de servidores por SETOR e ANO.
+media_por_setores <- calcular_medias_dos_setores_em_cada_avaliacao(cesta_de_indicadores)
 
+# Chama a fun√ß√£o 'variabilidade_por_setor' para calcular a variabilidade entre as m√©dias de diferentes avalia√ß√µes (ANO) para cada SETOR.
+resultado <- variabilidade_por_setor(media_por_setores)
